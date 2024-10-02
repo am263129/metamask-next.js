@@ -58,7 +58,7 @@ export default function Wallet() {
   };
 
   return (
-    <div className="bg-truffle">
+    <div className="bg-black">
       <div className="mx-auto max-w-2xl py-16 px-4 text-center sm:py-20 sm:px-6 lg:px-8">
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           <span className="block">Metamask API intro</span>
@@ -100,7 +100,7 @@ export default function Wallet() {
         {showConnectButton && (
           <button
             onClick={handleConnect}
-            className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-ganache text-white px-5 py-3 text-base font-medium  sm:w-auto"
+            className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent  bg-blue-500 text-white px-5 py-3 text-base font-medium  sm:w-auto"
           >
             {status === "loading" ? <Loading /> : "Connect Wallet"}
           </button>
@@ -110,7 +110,7 @@ export default function Wallet() {
           <Link
             href="https://metamask.io/"
             target="_blank"
-            className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-ganache text-white px-5 py-3 text-base font-medium  sm:w-auto"
+            className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent  bg-blue-500 text-white px-5 py-3 text-base font-medium  sm:w-auto"
           >
             Install Metamask
           </Link>
@@ -118,15 +118,15 @@ export default function Wallet() {
 
         {isConnected && (
           <div className="flex  w-full justify-center space-x-2">
-            <button
+            {/* <button
               onClick={handleAddUsdc}
               className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-ganache text-white px-5 py-3 text-base font-medium  sm:w-auto"
             >
               {status === "loading" ? <Loading /> : "Add Token"}
-            </button>
+            </button> */}
             <button
               onClick={handleDisconnect}
-              className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-ganache text-white px-5 py-3 text-base font-medium  sm:w-auto"
+              className="mt-8 inline-flex w-full items-center justify-center rounded-md border border-transparent bg-blue-500 text-white px-5 py-3 text-base font-medium  sm:w-auto"
             >
               Disconnect
             </button>
