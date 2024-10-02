@@ -4,6 +4,7 @@ import Web3 from "web3";
 
 const MetaMaskPage = () => {
   const [account, setAccount] = useState(null);
+  const [balance, setBalance] = useState(0)
   let accounts;
   let userAddress;
   let privateKey = process.env.PRIVATE_KEY;
@@ -15,6 +16,8 @@ const MetaMaskPage = () => {
           const web3 = new Web3(window.ethereum);
           accounts = await web3.eth.getAccounts();
           userAddress = accounts[0];
+          var balance = await web3.eth.getBalance(userAddress); //Will give value in.
+          setBalance(balance);
           setAccount(userAddress);
 
           window.ethereum.on("accountsChanged", async (accounts) => {
@@ -123,7 +126,7 @@ const MetaMaskPage = () => {
             >
               Set Smart Contract
             </button> */}
-            <p className="text-gray-700">Your account address: {account}</p>
+            <p className="text-gray-700">Your account address: {account} balance: {balance}</p>
           </>
         ) : null}
       </div>
