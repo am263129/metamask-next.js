@@ -1,137 +1,44 @@
-import Head from "next/head";
-import { useState, useEffect } from "react";
-import Web3 from "web3";
+import type { NextPage } from "next";
+import { useEffect } from "react";
+import Wallet from "../components/Wallet";
+import { useListen } from "../hooks/useListen";
+import { useMetamask } from "../hooks/useMetamask";
 
-const MetaMaskPage = () => {
-  const [account, setAccount] = useState(null);
-  const [balance, setBalance] = useState(0)
-  let accounts;
-  let userAddress;
-  let privateKey = process.env.PRIVATE_KEY;
+const Home: NextPage = () => {
+  const { dispatch } = useMetamask();
+  const listen = useListen();
 
   useEffect(() => {
-    const fetchAccount = async () => {
-      try {
-        window.ethereum.enable().then(async () => {
-          const web3 = new Web3(window.ethereum);
-          accounts = await web3.eth.getAccounts();
-          userAddress = accounts[0];
-          var balance = await web3.eth.getBalance(userAddress); //Will give value in.
-          setBalance(balance);
-          setAccount(userAddress);
+    if (typeof window !== undefined) {
+      // start by checking if window.ethereum is present, indicating a wallet extension
+      const ethereumProviderInjected = typeof window.ethereum !== "undefined";
+      // this could be other wallets so we can verify if we are dealing with metamask
+      // using the boolean constructor to be explecit and not let this be used as a falsy value (optional)
+      const isMetamaskInstalled =
+        ethereumProviderInjected && Boolean(window.ethereum.isMetaMask);
 
-          window.ethereum.on("accountsChanged", async (accounts) => {
-            // handle account change
-            accounts = await web3.eth.getAccounts();
-            userAddress = accounts[0];
-            setAccount(userAddress);
-          });
+      const local = window.localStorage.getItem("metamaskState");
 
-          window.ethereum.on("disconnect", () => {
-            // handle metamask logout
-            console.log("disconnect");
-            setAccount(null);
-          });
-        });
-      } catch (error) {
-        if (error.message === "User denied account authorization") {
-          // handle the case where the user denied the connection request
-        } else if (error.message === "MetaMask is not enabled") {
-          // handle the case where MetaMask is not available
-        } else {
-          // handle other errors
-        }
+      // user was previously connected, start listening to MM
+      if (local) {
+        listen();
       }
-    };
-    // call the function
-    fetchAccount()
-      // make sure to catch any error
-      .catch(console.error);
-  }, []);
 
-  const getContract = async () => {
-    const contract = new web3.eth.Contract(
-      process.env.ABI,
-      process.env.CONTRACT_ADDRESS
-    );
+      // local could be null if not present in LocalStorage
+      const { wallet, balance } = local
+        ? JSON.parse(local)
+        : // backup if local storage is empty
+          { wallet: null, balance: null };
 
-    const data = await contract.methods.getData().call();
-    console.log(data);
-  };
-
-  const setContract = async () => {
-    const contract = new web3.eth.Contract(
-      process.env.ABI,
-      process.env.CONTRACT_ADDRESS
-    );
-
-    const value = 1;
-    const gas = await contract.methods.setData(value).estimateGas();
-
-    const gasPrice = await web3.eth.getGasPrice();
-    const nonce = await web3.eth.getTransactionCount(userAddress);
-
-    const tx = {
-      from: userAddress,
-      to: process.env.CONTRACT_ADDRESS,
-      gasPrice: gasPrice,
-      gas: gas,
-      nonce: nonce,
-      data: contract.methods.setData(value).encodeABI(),
-    };
-
-    const signedTx = await web3.eth.accounts.signTransaction(tx, privateKey);
-
-    const receipt = await web3.eth.sendSignedTransaction(
-      signedTx.rawTransaction
-    );
-    if (receipt.status === "0x1") {
-      // the transaction was successful
-    } else {
-      // the transaction failed
+      dispatch({ type: "pageLoaded", isMetamaskInstalled, wallet, balance });
     }
-  };
+  }, []);
 
   return (
     <>
-      <Head>
-        <title>MetaMask and Web3.js Integration with Next.js</title>
-        <meta
-          name="description"
-          content="MetaMask and Web3.js Integration with Next.js"
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="p-4">
-        {!account ? (
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
-            onClick={() => window.ethereum.enable()}
-          >
-            Connect to MetaMask
-          </button>
-        ) : null}
-        {account ? (
-          <>
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
-              onClick={getContract}
-            >
-              Get Smart Contract
-            </button>
-            <button
-              className="ml-5 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
-              onClick={setContract}
-            >
-              Set Smart Contract
-            </button> */}
-            <p className="text-gray-700">Your account address: {account} balance: {balance}</p>
-          </>
-        ) : null}
-      </div>
+      <Wallet />
     </>
   );
 };
 
-export default MetaMaskPage;
+export default Home;
