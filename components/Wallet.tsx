@@ -63,17 +63,7 @@ export default function Wallet() {
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           <span className="block">Metamask API intro</span>
         </h2>
-        <p className="mt-4 text-lg leading-6 text-white">
-          Follow along with the{" "}
-          <Link
-            href="https://github.com/GuiBibeau/web3-unleashed-demo"
-            target="_blank"
-          >
-            <span className="underline cursor-pointer">Repo</span>
-          </Link>{" "}
-          in order to learn how to use the Metamask API.
-        </p>
-
+        
         {wallet && balance && (
           <div className=" px-4 py-5 sm:px-6">
             <div className="-ml-4 -mt-4 flex flex-wrap items-center justify-between sm:flex-nowrap">
